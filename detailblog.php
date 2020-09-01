@@ -26,9 +26,9 @@
   $stmt = $pdo->prepare("SELECT * FROM posts WHERE id=".$post_id);
     $stmt->execute();
     $blog = $stmt->fetch(PDO::FETCH_ASSOC);
-
+ 
   ####Comment
-  $stmtcmt = $pdo->prepare("SELECT * FROM comments WHERE post_id=".$post_id);
+  $stmtcmt = $pdo->prepare("SELECT users.name,comments.* FROM users,comments,posts WHERE users.id=comments.author_id AND posts.id=comments.post_id AND posts.id=$post_id");
     $stmtcmt->execute();
     $comments = $stmtcmt->fetchAll();
 
@@ -85,12 +85,7 @@
                   <div class="card-comment">
                     <div class="comment-text" style="margin-left: 0px !important">
                       <span class="username">
-                        <?
-                          $stmtname = $pdo->prepare("SELECT name FROM users WHERE id=".$comment['author_id']);
-                          $stmtname->execute();
-                           $result = $stmtname->fetch();
-                           echo $result['name'];
-                        ?>
+                        <?=$comment['name']?>
                         <span class="text-muted float-right"><?= $comment['created_at']?></span>
                       </span><!-- /.username -->
                       <?= $comment['content'] ?>
