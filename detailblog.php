@@ -1,3 +1,39 @@
+<?php
+  session_start();
+  require 'config/config.php';
+
+  if(empty($_SESSION['id']) && empty($_SESSION['logged_in'])){
+    header("location: login.php");
+  }
+
+  $post_id = $_GET['id'];
+
+  if(isset($_POST['comment'])){
+  $comment = $_POST['comment'];
+  $userid = $_SESSION['id'];
+
+  $stmt = $pdo->prepare("INSERT INTO comments(content,author_id,post_id) VALUES (:content,:author_id,:post_id)");
+      $result = $stmt->execute(
+        array(
+          ":content"=>$comment,
+          ":author_id"=>$userid,
+          ":post_id"=>$post_id
+        )
+      );
+  
+}
+  ####Blog
+  $stmt = $pdo->prepare("SELECT * FROM posts WHERE id=".$post_id);
+    $stmt->execute();
+    $blog = $stmt->fetch(PDO::FETCH_ASSOC);
+
+  ####Comment
+  $stmtcmt = $pdo->prepare("SELECT * FROM comments WHERE post_id=".$post_id);
+    $stmtcmt->execute();
+    $comments = $stmtcmt->fetchAll();
+
+?>
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -28,64 +64,55 @@
             <div class="card card-widget">
               <div class="card-header">
                  <div style="float:none; text-align: center" class="card-title">
-                  <h4>Blog Title</h4>
+                  <h4><?= $blog['title']?></h4>
                 </div>
                 <!-- /.card-tools -->
               </div>
               <!-- /.card-header -->
               <div class="card-body">
-                <img class="img-fluid pad" src="dist/img/photo2.png" alt="Photo">
-
-                <p>I took this photo this morning. What do you guys think?</p>
-                <button type="button" class="btn btn-default btn-sm"><i class="fas fa-share"></i> Share</button>
-                <button type="button" class="btn btn-default btn-sm"><i class="far fa-thumbs-up"></i> Like</button>
-                <span class="float-right text-muted">127 likes - 3 comments</span>
+                <img class="img-fluid pad" src="images/<?= $blog['image']?>" alt="Photo" width="100%">
+                <br><br>
+                <p><?= $blog['content']?></p>
+                <h5>Comments</h5><hr>
+                <a href="index.php" type="button" class="btn btn-default">Go Back</a>
               </div>
               <!-- /.card-body -->
               <div class="card-footer card-comments">
-                <div class="card-comment">
-                  <!-- User image -->
-                  <img class="img-circle img-sm" src="dist/img/user3-128x128.jpg" alt="User Image">
-
-                  <div class="comment-text">
-                    <span class="username">
-                      Maria Gonzales
-                      <span class="text-muted float-right">8:03 PM Today</span>
-                    </span><!-- /.username -->
-                    It is a long established fact that a reader will distracted
-                    by the readable content of a page when looking at its layout.
-                  </div>
+                
+                  <?php
+                    foreach ($comments as $comment) {
+                  ?>
+                  <div class="card-comment">
+                    <div class="comment-text" style="margin-left: 0px !important">
+                      <span class="username">
+                        <?
+                          $stmtname = $pdo->prepare("SELECT name FROM users WHERE id=".$comment['author_id']);
+                          $stmtname->execute();
+                           $result = $stmtname->fetch();
+                           echo $result['name'];
+                        ?>
+                        <span class="text-muted float-right"><?= $comment['created_at']?></span>
+                      </span><!-- /.username -->
+                      <?= $comment['content'] ?>
+                    </div>
+                   </div>
+                  <?php
+                    }
+                  ?>
+                  
                   <!-- /.comment-text -->
-                </div>
-                <!-- /.card-comment -->
-                <div class="card-comment">
-                  <!-- User image -->
-                  <img class="img-circle img-sm" src="dist/img/user4-128x128.jpg" alt="User Image">
 
-                  <div class="comment-text">
-                    <span class="username">
-                      Luna Stark
-                      <span class="text-muted float-right">8:03 PM Today</span>
-                    </span><!-- /.username -->
-                    It is a long established fact that a reader will distracted
-                    by the readable content of a page when looking at its layout.
-                  </div>
-                  <!-- /.comment-text -->
-                </div>
-                <!-- /.card-comment -->
-              </div>
-              <!-- /.card-footer -->
-              <div class="card-footer">
-                <form action="#" method="post">
-                  <img class="img-fluid img-circle img-sm" src="dist/img/user4-128x128.jpg" alt="Alt Text">
-                  <!-- .img-push is used to add margin to elements next to floating images -->
+            </div>
+
+            <div class="card-footer">
+                <form action="" method="post">
+                  
                   <div class="img-push">
-                    <input type="text" class="form-control form-control-sm" placeholder="Press enter to post comment">
+                    <input type="text" name="comment" class="form-control form-control-sm" placeholder="Press enter to post comment">
                   </div>
                 </form>
               </div>
-              <!-- /.card-footer -->
-            </div>
+
             <!-- /.card -->
           </div>
           <!-- /.col -->
@@ -100,12 +127,13 @@
   </div>
   <!-- /.content-wrapper -->
 
-  <footer class="main-footer" style="margin-left: 0px !important">
-    <div class="float-right d-none d-sm-block">
-      <b>Version</b> 3.0.5
+   <footer class="main-footer" style="margin-left: 0px !important">
+    <!-- To the right -->
+    <div class="float-right d-none d-sm-inline">
+      <a href="logout.php" type="button" >Log out</a>
     </div>
-    <strong>Copyright &copy; 2014-2019 <a href="http://adminlte.io">AdminLTE.io</a>.</strong> All rights
-    reserved.
+    <!-- Default to the left -->
+    <strong>Copyright &copy; 2020 <a href="#">A programmer</a>.</strong> All rights reserved.
   </footer>
 
   <!-- Control Sidebar -->

@@ -20,13 +20,13 @@
           <div class="col-md-12">
             <div class="card">
               <div class="card-header">
-                <h3 class="card-title">Blog Listings</h3>
+                <h3 class="card-title">User Listings</h3>
               </div>
               <!-- /.card-header -->
               <div class="card-body">
                 <div>
-                  <h6 style="display: inline;margin-right:5px">New Blog Post</h6>
-                  <a href="add.php" type="button" class="btn btn-success">Create +</a>
+                  <h6 style="display: inline;margin-right:5px">Add New Account</h6>
+                  <a href="user_add.php" type="button" class="btn btn-success">Add +</a>
                 </div>
                 <br>
                 <?php
@@ -35,29 +35,29 @@
                   }else{
                     $pageno = 1;
                   }
-                  $numOfRecs = 2;
+                  $numOfRecs = 5;
                   $offset = ($pageno - 1) * $numOfRecs;
 
                   if(empty($_POST['search'])){
-                    $pdostatement = $pdo->prepare("SELECT * FROM posts ORDER BY id DESC");
+                    $pdostatement = $pdo->prepare("SELECT * FROM users ORDER BY id DESC");
                     $pdostatement->execute();
                     $result = $pdostatement->fetchAll();
                     $total_pages = ceil(count($result)/$numOfRecs);
                     
-                       $pdostatement = $pdo->prepare("SELECT * FROM posts ORDER BY id DESC LIMIT $offset,$numOfRecs");
+                       $pdostatement = $pdo->prepare("SELECT * FROM users ORDER BY id DESC LIMIT $offset,$numOfRecs");
                        $pdostatement->execute();
-                       $blogs = $pdostatement->fetchAll();
+                       $users = $pdostatement->fetchAll();
                     
                   }else{
                     $searchkey = $_POST['search'];
-                    $pdostatement = $pdo->prepare("SELECT * FROM posts WHERE title LIKE '%$searchkey%' ORDER BY id DESC");
+                    $pdostatement = $pdo->prepare("SELECT * FROM users WHERE name LIKE '%$searchkey%' ORDER BY id DESC");
                     $pdostatement->execute();
                     $result = $pdostatement->fetchAll();
                     $total_pages = ceil(count($result)/$numOfRecs);
                     
-                       $pdostatement = $pdo->prepare("SELECT * FROM posts WHERE title LIKE '%$searchkey%' ORDER BY id DESC LIMIT $offset,$numOfRecs");
+                       $pdostatement = $pdo->prepare("SELECT * FROM users WHERE name LIKE '%$searchkey%' ORDER BY id DESC LIMIT $offset,$numOfRecs");
                        $pdostatement->execute();
-                       $blogs = $pdostatement->fetchAll();
+                       $users = $pdostatement->fetchAll();
                     
                   }
                 ?>
@@ -65,8 +65,9 @@
                   <thead>                  
                     <tr>
                       <th style="width: 10px">#</th>
-                      <th>Title</th>
-                      <th>Content</th>
+                      <th>Name</th>
+                      <th>Email</th>
+                      <th>Role</th>
                       <th style="width: 40px">Actions</th>
                     </tr>
                   </thead>
@@ -74,22 +75,23 @@
 
                     <?php
 
-                      if($blogs){
+                      if($users){
                         $i=1;
-                        foreach ($blogs as $blog) {
+                        foreach ($users as $user) {
                     ?>
                         <tr>
                           <td><?= $i ?></td>
-                          <td><?= $blog['title'] ?></td>
-                          <td><?= substr($blog['content'],0,50)."..." ?></td>
+                          <td><?= $user['name'] ?></td>
+                          <td><?= $user['email'] ?></td>
+                          <td><? if($user['role']==1){echo "admin";}else{echo "user";} ?></td>
                           <td>
                             <div class="btn-group">
                               <div class="container">
-                                <a href="edit.php?id=<?= $blog['id'] ?>" type="button" class="btn btn-warning" >Edit</a>
+                                <a href="user_edit.php?id=<?= $user['id'] ?>" type="button" class="btn btn-warning" >Edit</a>
                               </div>
                               <div class="container">
-                                <a href="delete.php?id=<?= $blog['id'] ?>" 
-                                  onclick="return confirm('Are you sure you want to delete this blog?')" 
+                                <a href="user_delete.php?id=<?= $user['id'] ?>" 
+                                  onclick="return confirm('Are you sure you want to delete this account?')" 
                                   type="button" class="btn btn-danger" >Delete</a>
                               </div>
                             </div>

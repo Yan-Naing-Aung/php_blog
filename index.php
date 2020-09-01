@@ -1,3 +1,12 @@
+<?php
+  session_start();
+  require 'config/config.php';
+
+  if(empty($_SESSION['id']) && empty($_SESSION['logged_in'])){
+    header("location: login.php");
+  }
+?>
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -32,126 +41,85 @@
       </div><!-- /.container-fluid -->
     </section>
 
+    <?php
+      if(isset($_GET['pageno'])){
+        $pageno = $_GET['pageno'];
+      }else{
+        $pageno = 1;
+      }
+      $numOfRecs = 6;
+      $offset = ($pageno-1) * $numOfRecs ;
+
+      $pdostatement = $pdo->prepare("SELECT * FROM posts ORDER BY id DESC");
+      $pdostatement->execute();
+      $result = $pdostatement->fetchAll();
+
+      $total_pages = ceil(count($result)/$numOfRecs);
+
+      $pdostatement = $pdo->prepare("SELECT * FROM posts ORDER BY id DESC LIMIT $offset,$numOfRecs");
+      $pdostatement->execute();
+      $blogs = $pdostatement->fetchAll();
+
+
+    ?>
+
     <!-- Main content -->
     <section class="content">
       <div class="container">
         
         <div class="row">
+          <?php
+
+            if($blogs){
+              $i=1;
+              foreach ($blogs as $blog) {
+          ?>
           <div class="col-md-4">
             <!-- Box Comment -->
             <div class="card card-widget">
               <div class="card-header">
                 <div style="float:none; text-align: center" class="card-title">
-                  <h4>Blog Title</h4>
+                  <h4><?= $blog['title']?></h4>
                 </div>
               </div>
               <!-- /.card-header -->
               <div class="card-body">
-                <img class="img-fluid pad" src="dist/img/photo2.png" alt="Photo">
-
-                <p>I took this photo this morning. What do you guys think?</p>
+                <a href="detailblog.php?id=<?=$blog['id']?>"><img class="img-fluid pad" src="images/<?= $blog['image']?>" style="height:200px !important" alt="Photo"></a>
               </div>
             </div>
             <!-- /.card -->
           </div>
           <!-- /.col -->
-
-          <div class="col-md-4">
-            <!-- Box Comment -->
-            <div class="card card-widget">
-              <div class="card-header">
-                <div style="float:none; text-align: center" class="card-title">
-                  <h4>Blog Title</h4>
-                </div>
-              </div>
-              <!-- /.card-header -->
-              <div class="card-body">
-                <img class="img-fluid pad" src="dist/img/photo2.png" alt="Photo">
-
-                <p>I took this photo this morning. What do you guys think?</p>
-              </div>
-            </div>
-            <!-- /.card -->
-          </div>
-
-          <div class="col-md-4">
-            <!-- Box Comment -->
-            <div class="card card-widget">
-              <div class="card-header">
-                <div style="float:none; text-align: center" class="card-title">
-                  <h4>Blog Title</h4>
-                </div>
-              </div>
-              <!-- /.card-header -->
-              <div class="card-body">
-                <img class="img-fluid pad" src="dist/img/photo2.png" alt="Photo">
-
-                <p>I took this photo this morning. What do you guys think?</p>
-              </div>
-            </div>
-            <!-- /.card -->
-          </div>
+          <?
+                $i++;
+              }
+            }
+          ?>
 
       </div>
+      <div style="overflow: hidden">
+        <nav aria-label="Page navigation example" style="float: right;">
+          <ul class="pagination">
+            <li class="page-item"><a class="page-link" href="?pageno=1">First</a></li>
 
-      <div class="row">
-          <div class="col-md-4">
-            <!-- Box Comment -->
-            <div class="card card-widget">
-              <div class="card-header">
-                <div style="float:none; text-align: center" class="card-title">
-                  <h4>Blog Title</h4>
-                </div>
-              </div>
-              <!-- /.card-header -->
-              <div class="card-body">
-                <img class="img-fluid pad" src="dist/img/photo2.png" alt="Photo">
+            <li class="page-item <?php if($pageno<=1){echo 'disabled';} ?>">
+            <a class="page-link" href="<?if($pageno<=1){echo '#';}else{echo '?pageno='.($pageno-1);}?>">Previous</a>
+            </li>
 
-                <p>I took this photo this morning. What do you guys think?</p>
-              </div>
-            </div>
-            <!-- /.card -->
-          </div>
-          <!-- /.col -->
-
-          <div class="col-md-4">
-            <!-- Box Comment -->
-            <div class="card card-widget">
-              <div class="card-header">
-                <div style="float:none; text-align: center" class="card-title">
-                  <h4>Blog Title</h4>
-                </div>
-              </div>
-              <!-- /.card-header -->
-              <div class="card-body">
-                <img class="img-fluid pad" src="dist/img/photo2.png" alt="Photo">
-
-                <p>I took this photo this morning. What do you guys think?</p>
-              </div>
-            </div>
-            <!-- /.card -->
-          </div>
-
-          <div class="col-md-4">
-            <!-- Box Comment -->
-            <div class="card card-widget">
-              <div class="card-header">
-                <div style="float:none; text-align: center" class="card-title">
-                  <h4>Blog Title</h4>
-                </div>
-              </div>
-              <!-- /.card-header -->
-              <div class="card-body">
-                <img class="img-fluid pad" src="dist/img/photo2.png" alt="Photo">
-
-                <p>I took this photo this morning. What do you guys think?</p>
-              </div>
-            </div>
-            <!-- /.card -->
-          </div>
-
+            <li class="page-item"><a class="page-link" href="#"><?php echo $pageno; ?></a></li>
+            
+            <li class="page-item <?php if($pageno >= $total_pages){echo 'disabled';} ?>">
+              <a class="page-link " href="<? if($pageno>=$total_pages){echo '#';}else{echo '?pageno='.($pageno+1);} ?>">Next</a>
+            </li>
+            
+            <li class="page-item"><a class="page-link" href="?pageno=<?= $total_pages?>">Last</a></li>
+          </ul>
+        </nav>
       </div>
-      </div>
+       
+      
+
+     </div>
     </section>
     <!-- /.content -->
 
@@ -162,11 +130,12 @@
   <!-- /.content-wrapper -->
 
   <footer class="main-footer" style="margin-left: 0px !important">
-    <div class="float-right d-none d-sm-block">
-      <b>Version</b> 3.0.5
+    <!-- To the right -->
+    <div class="float-right d-none d-sm-inline">
+      <a href="logout.php" type="button" >Log out</a>
     </div>
-    <strong>Copyright &copy; 2014-2019 <a href="http://adminlte.io">AdminLTE.io</a>.</strong> All rights
-    reserved.
+    <!-- Default to the left -->
+    <strong>Copyright &copy; 2020 <a href="#">A programmer</a>.</strong> All rights reserved.
   </footer>
 
   <!-- Control Sidebar -->
