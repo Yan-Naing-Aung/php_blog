@@ -15,12 +15,13 @@ if(isset($_POST['submit'])){
   if($result){
     echo "<script>alert('There is account already created with this email!')</script>";
   }else{
-    $stmt = $pdo->prepare("INSERT INTO users(name,email,password) VALUES (:name,:email,:pass)");
+    $stmt = $pdo->prepare("INSERT INTO users(name,email,password,role) VALUES (:name,:email,:pass,:role)");
       $result = $stmt->execute(
         array(
           ":name"=>$name,
           ":email"=>$email,
-          ":pass"=>$pass
+          ":pass"=>$pass,
+          ":role"=>0
         )
       );
     if($result){

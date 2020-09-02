@@ -6,6 +6,15 @@
     header("location: login.php");
   }
   $user_id=$_SESSION['id'];
+
+  if(isset($_POST['search'])){
+    setcookie('search', $_POST['search'], time() + (86400 * 30), "/");
+  }else{
+    if(empty($_GET['pageno'])){
+      unset($_COOKIE['search']); 
+      setcookie('search', null, -1, '/'); 
+    }
+  }
 ?>
 
 <?php
@@ -35,10 +44,10 @@
                   }else{
                     $pageno = 1;
                   }
-                  $numOfRecs = 4;
+                  $numOfRecs = 5;
                   $offset = ($pageno - 1) * $numOfRecs;
 
-                  if(empty($_POST['search'])){
+                  if(empty($_POST['search']) && empty($_COOKIE['search'])){
                     $pdostatement = $pdo->prepare("SELECT * FROM posts ORDER BY id DESC");
                     $pdostatement->execute();
                     $result = $pdostatement->fetchAll();
@@ -49,7 +58,7 @@
                        $blogs = $pdostatement->fetchAll();
                     
                   }else{
-                    $searchkey = $_POST['search'];
+                    $searchkey = isset($_POST['search'])?$_POST['search']:$_COOKIE['search'];
                     $pdostatement = $pdo->prepare("SELECT * FROM posts WHERE title LIKE '%$searchkey%' ORDER BY id DESC");
                     $pdostatement->execute();
                     $result = $pdostatement->fetchAll();

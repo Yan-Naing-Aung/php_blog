@@ -2,7 +2,7 @@
   session_start();
   require '../config/config.php';
 
-  if(empty($_SESSION['id']) && empty($_SESSION['logged_in'])){
+  if((empty($_SESSION['id']) && empty($_SESSION['logged_in'])) || $_SESSION['role']==0){
     header("location: login.php");
   }
   
@@ -28,7 +28,7 @@
         )
       );
       if($result){
-        echo "<script>alert('New account is added.');window.locaiton.href='users.php'</script>";
+        echo "<script>alert('New account is added.');window.location.href='users.php'</script>";
       }
 
     
