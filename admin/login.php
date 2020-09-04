@@ -12,7 +12,7 @@ if(isset($_POST['submit'])){
 	$user = $pdostatement->fetch(PDO::FETCH_ASSOC);
 
 	if($user){
-		if($pass == $user['password'] ){
+		if(password_verify($pass, $user['password'])){
 			$_SESSION['id'] = $user['id'];
       $_SESSION['username'] = $user['name'];
 			$_SESSION['logged_in'] = time();

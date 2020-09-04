@@ -23,7 +23,7 @@
     else{
       $name = $_POST['name'];
       $email = $_POST['email'];
-      $pass = $_POST['pass'];
+      $pass = password_hash($_POST['pass'], PASSWORD_DEFAULT);
       $id = $_POST['id'];
 
       if(!empty($_POST['admin'])){
@@ -82,7 +82,7 @@
                   <div class="form-group">
                     <label for="">Password</label><?= empty($passError)?'':$passError;?>
                     <span>User already has a password</span>
-                    <input type="Password" class="form-control" name="pass" required>
+                    <input type="Password" class="form-control" name="pass" >
                   </div>
                   <div class="form-group" style="margin-bottom: 1.5rem">
                     <label>Role</label>

@@ -23,7 +23,7 @@
     }else{
       $name = $_POST['name'];
       $email = $_POST['email'];
-      $pass = $_POST['pass'];
+      $pass = password_hash($_POST['pass'], PASSWORD_DEFAULT);
       
       if(!empty($_POST['admin'])){
         $admincheck = 1;

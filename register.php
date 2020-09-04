@@ -19,7 +19,7 @@ if(isset($_POST['submit'])){
   }else{
     $name = $_POST['name'];
     $email = $_POST['email'];
-    $pass = $_POST['password'];
+    $pass = password_hash($_POST['password'], PASSWORD_DEFAULT);
 
     $pdostatement = $pdo->prepare("SELECT * FROM users where email=:email");
     $pdostatement->bindValue(':email',$email);
