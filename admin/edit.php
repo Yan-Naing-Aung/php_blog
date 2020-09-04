@@ -1,6 +1,7 @@
 <?php
-  session_start();
+  
   require '../config/config.php';
+  require '../config/common.php';
 
   if((empty($_SESSION['id']) && empty($_SESSION['logged_in'])) || $_SESSION['role']==0){
     header("location: login.php");
@@ -72,6 +73,7 @@
               <div class="card-body">
                  <form action="" method="post" enctype="multipart/form-data">
                   <input type="hidden" name="id" value="<?= $result['id']?>">
+                  <input type="hidden" name="_token" value="<?= $_SESSION['_token']; ?>">
                   <div class="form-group">
                     <label for="">Title</label><?= empty($titleError)?'':$titleError;?>
                     <input type="text" class="form-control" name="title" value="<?= $result['title']?>" required>
@@ -84,7 +86,7 @@
                   <div class="form-group">
                     <label for="">Image</label><?= empty($imageError)?'':$imageError;?><br>
                     <img src="../images/<?= $result['image']?>" width="500"><br><br>
-                    <input type="file" name="image" required>
+                    <input type="file" name="image">
                   </div>
                   <div class="form-group">
                     <input type="submit" class="btn btn-success" name="submit" value="SUBMIT">

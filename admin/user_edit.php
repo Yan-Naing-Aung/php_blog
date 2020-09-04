@@ -1,6 +1,7 @@
 <?php
-  session_start();
+  
   require '../config/config.php';
+  require '../config/common.php';
 
   if((empty($_SESSION['id']) && empty($_SESSION['logged_in'])) || $_SESSION['role']==0){
     header("location: login.php");
@@ -70,6 +71,7 @@
             <div class="card">
               <div class="card-body">
                  <form action="" method="post">
+                  <input type="hidden" name="_token" value="<?= $_SESSION['_token']; ?>">
                   <input type="hidden" name="id" value="<?= $result['id']?>">
                   <div class="form-group">
                     <label for="">Name</label><?= empty($nameError)?'':$nameError;?>
