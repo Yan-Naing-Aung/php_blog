@@ -8,29 +8,46 @@
   
   if(isset($_POST['submit'])){
 
-    $name = $_POST['name'];
-    $email = $_POST['email'];
-    $id = $_POST['id'];
 
-    if(!empty($_POST['admin'])){
-      $admincheck = 1;
-    }else{
-      $admincheck = 0;
+    if(empty($_POST['name']) || empty($_POST['email']) ){
+      if(empty($_POST['name'])){
+        $nameError = "<p style='color:red'>*Name cannot be null</p>";
+      }
+      if(empty($_POST['email'])){
+        $emailError = "<p style='color:red'>*Email cannot be null</p>";
+      }
+
+    }elseif(!empty($_POST['pass']) && strlen($_POST['pass'])<4){
+      $passError = "<p style='color:red'>*Password should be at least 4 characters</p>";
     }
+    else{
+      $name = $_POST['name'];
+      $email = $_POST['email'];
+      $pass = $_POST['pass'];
+      $id = $_POST['id'];
 
+      if(!empty($_POST['admin'])){
+        $admincheck = 1;
+      }else{
+        $admincheck = 0;
+      }
 
-    $stmt = $pdo->prepare("SELECT * FROM users WHERE email=:email AND id!=:id");
-    $stmt->execute(array(':email'=>$email,':id'=>$id));
-    $user = $stmt->fetchAll();
-    
-    if($user){
-      echo "<script>alert('Email Duplicated!');</script>";
-    }else{
+      $stmt = $pdo->prepare("SELECT * FROM users WHERE email=:email AND id!=:id");
+      $stmt->execute(array(':email'=>$email,':id'=>$id));
+      $user = $stmt->fetchAll();
       
-      $stmt = $pdo->prepare("UPDATE users SET name='$name',email='$email',role='$admincheck' WHERE id='$id'");
-      $result = $stmt->execute();
-      if($result){
-        echo "<script>alert('Successfully Updated.');window.location.href='users.php';</script>";
+      if($user){
+        echo "<script>alert('Email Duplicated!');</script>";
+      }else{
+        if(empty($_POST['pass'])){
+           $stmt = $pdo->prepare("UPDATE users SET name='$name',email='$email',role='$admincheck' WHERE id='$id'");
+        }else{
+           $stmt = $pdo->prepare("UPDATE users SET name='$name',email='$email',role='$admincheck',password='$pass' WHERE id='$id'");
+        }
+        $result = $stmt->execute();
+        if($result){
+          echo "<script>alert('Successfully Updated.');window.location.href='users.php';</script>";
+        }
       }
     }
      
@@ -55,13 +72,18 @@
                  <form action="" method="post">
                   <input type="hidden" name="id" value="<?= $result['id']?>">
                   <div class="form-group">
-                    <label for="">Name</label>
+                    <label for="">Name</label><?= empty($nameError)?'':$nameError;?>
                     <input type="text" class="form-control" name="name" value="<?= $result['name']?>" required>
                   </div>
                   <div class="form-group">
-                    <label for="">Email</label><br>
+                    <label for="">Email</label><?= empty($emailError)?'':$emailError;?>
                     <input type="email" class="form-control" name="email" value="<?= $result['email']?>" required>
                   </div>  
+                  <div class="form-group">
+                    <label for="">Password</label><?= empty($passError)?'':$passError;?>
+                    <span>User already has a password</span>
+                    <input type="Password" class="form-control" name="pass" required>
+                  </div>
                   <div class="form-group" style="margin-bottom: 1.5rem">
                     <label>Role</label>
                     <div class="form-check" style="display: inline;margin-left: 7px">

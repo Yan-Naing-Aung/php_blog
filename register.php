@@ -3,32 +3,48 @@ session_start();
 require "config/config.php";
 
 if(isset($_POST['submit'])){
-  $name = $_POST['name'];
-	$email = $_POST['email'];
-	$pass = $_POST['password'];
 
-  $pdostatement = $pdo->prepare("SELECT * FROM users where email=:email");
-  $pdostatement->bindValue(':email',$email);
-  $pdostatement->execute();
-  $result = $pdostatement->fetch(PDO::FETCH_ASSOC);
-	
-  if($result){
-    echo "<script>alert('There is account already created with this email!')</script>";
+  if(empty($_POST['name']) || empty($_POST['email']) ||empty($_POST['password']) || strlen($_POST['password'])<4 ){
+      if(empty($_POST['name'])){
+        $nameError = "<p style='color:red'>*Name cannot be null</p>";
+      }
+      if(empty($_POST['email'])){
+        $emailError = "<p style='color:red'>*Email cannot be null</p>";
+      }
+      if(empty($_POST['password'])){
+        $passError = "<p style='color:red'>*Password cannot be null</p>";
+      }elseif(strlen($_POST['password'])<4){
+        $passError = "<p style='color:red'>*Password should be at least 4 characters</p>";
+      }
   }else{
-    $stmt = $pdo->prepare("INSERT INTO users(name,email,password,role) VALUES (:name,:email,:pass,:role)");
-      $result = $stmt->execute(
-        array(
-          ":name"=>$name,
-          ":email"=>$email,
-          ":pass"=>$pass,
-          ":role"=>0
-        )
-      );
-    if($result){
-      echo "<script>alert('Register Successfully. You can now login :)');window.location.href='login.php'</script>";
-    }
+    $name = $_POST['name'];
+    $email = $_POST['email'];
+    $pass = $_POST['password'];
 
+    $pdostatement = $pdo->prepare("SELECT * FROM users where email=:email");
+    $pdostatement->bindValue(':email',$email);
+    $pdostatement->execute();
+    $result = $pdostatement->fetch(PDO::FETCH_ASSOC);
+    
+    if($result){
+      echo "<script>alert('There is account already created with this email!')</script>";
+    }else{
+      $stmt = $pdo->prepare("INSERT INTO users(name,email,password,role) VALUES (:name,:email,:pass,:role)");
+        $result = $stmt->execute(
+          array(
+            ":name"=>$name,
+            ":email"=>$email,
+            ":pass"=>$pass,
+            ":role"=>0
+          )
+        );
+      if($result){
+        echo "<script>alert('Register Successfully. You can now login :)');window.location.href='login.php'</script>";
+      }
+
+    }
   }
+
 
 }
 ?>
@@ -64,14 +80,16 @@ if(isset($_POST['submit'])){
       <p class="login-box-msg">Register New Account</p>
 
       <form action="register.php" method="post">
+        <?= empty($nameError)?'':$nameError;?>
         <div class="input-group mb-3">
           <input type="text" name="name" class="form-control" placeholder="Name">
           <div class="input-group-append">
             <div class="input-group-text">
-              <span class="fas fa-envelope"></span>
+              <span class="fas fa-user"></span>
             </div>
-          </div>
+          </div><br>
         </div>
+        <?= empty($emailError)?'':$emailError;?>
         <div class="input-group mb-3">
           <input type="email" name="email" class="form-control" placeholder="Email">
           <div class="input-group-append">
@@ -80,6 +98,7 @@ if(isset($_POST['submit'])){
             </div>
           </div>
         </div>
+        <?= empty($passError)?'':$passError;?>
         <div class="input-group mb-3">
           <input type="password" name="password" class="form-control" placeholder="Password">
           <div class="input-group-append">

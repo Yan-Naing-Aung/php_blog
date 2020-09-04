@@ -8,41 +8,51 @@
   
   if(isset($_POST['submit'])){
 
-    $title = $_POST['title'];
-    $content = $_POST['content'];
-    $id = $_POST['id'];
-
-    if($_FILES['image']['name']!=null){
-
-      $type = $_FILES['image']['type'];
-      if($type!="image/png" && $type!="image/jpg" && $type!="image/jpeg")
-      {
-        echo "<script>alert('Image type must be png,jpg,jpeg! ')</script>";
+    if(empty($_POST['title']) || empty($_POST['content']) ){
+      if(empty($_POST['title'])){
+        $titleError = "<p style='color:red'>*Title cannot be null</p>";
       }
-      else
-      {
-        $imgname = $_FILES['image']['name'];
-        $tmp_name = $_FILES['image']['tmp_name'];
-
-        move_uploaded_file($tmp_name, "../images/$imgname");
-
-        $stmt = $pdo->prepare("UPDATE posts SET title='$title',content='$content',image='$imgname' WHERE id='$id'");
-        $result = $stmt->execute();
-        if($result){
-          echo "<script>alert('Successfully Updated.');window.location.href='index.php';</script>";
-        }
+      if(empty($_POST['content'])){
+        $contentError = "<p style='color:red'>*Content cannot be null</p>";
       }
-
     }else{
 
-      $stmt = $pdo->prepare("UPDATE posts SET title='$title',content='$content' WHERE id='$id'");
-      $result = $stmt->execute();
-      if($result){
-        echo "<script>alert('Successfully Updated.');window.location.href='index.php';</script>";
-      }
+      $title = $_POST['title'];
+      $content = $_POST['content'];
+      $id = $_POST['id'];
 
-    }  
+      if($_FILES['image']['name']!=null){
+
+        $type = $_FILES['image']['type'];
+        if($type!="image/png" && $type!="image/jpg" && $type!="image/jpeg")
+        {
+          echo "<script>alert('Image type must be png,jpg,jpeg! ')</script>";
+        }
+        else
+        {
+          $imgname = $_FILES['image']['name'];
+          $tmp_name = $_FILES['image']['tmp_name'];
+
+          move_uploaded_file($tmp_name, "../images/$imgname");
+
+          $stmt = $pdo->prepare("UPDATE posts SET title='$title',content='$content',image='$imgname' WHERE id='$id'");
+          $result = $stmt->execute();
+          if($result){
+            echo "<script>alert('Successfully Updated.');window.location.href='index.php';</script>";
+          }
+        }
+        }else{
+
+          $stmt = $pdo->prepare("UPDATE posts SET title='$title',content='$content' WHERE id='$id'");
+          $result = $stmt->execute();
+          if($result){
+            echo "<script>alert('Successfully Updated.');window.location.href='index.php';</script>";
+          }
+
+        } 
+    } 
   }
+
     $stmt = $pdo->prepare("SELECT * FROM posts WHERE id=".$_GET['id']);
     $stmt->execute();
     $result = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -63,18 +73,18 @@
                  <form action="" method="post" enctype="multipart/form-data">
                   <input type="hidden" name="id" value="<?= $result['id']?>">
                   <div class="form-group">
-                    <label for="">Title</label>
+                    <label for="">Title</label><?= empty($titleError)?'':$titleError;?>
                     <input type="text" class="form-control" name="title" value="<?= $result['title']?>" required>
                   </div>
                   <div class="form-group">
-                    <label for="">Content</label><br>
+                    <label for="">Content</label><?= empty($contentError)?'':$contentError;?><br>
                     <textarea class="form-control" name="content" rows="8" cols="80" required><?= $result['content']?>
                     </textarea>
                   </div>
                   <div class="form-group">
-                    <label for="">Image</label><br>
+                    <label for="">Image</label><?= empty($imageError)?'':$imageError;?><br>
                     <img src="../images/<?= $result['image']?>" width="500"><br><br>
-                    <input type="file" name="image">
+                    <input type="file" name="image" required>
                   </div>
                   <div class="form-group">
                     <input type="submit" class="btn btn-success" name="submit" value="SUBMIT">

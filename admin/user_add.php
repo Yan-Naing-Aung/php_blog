@@ -8,6 +8,19 @@
   
   if(isset($_POST['submit'])){
 
+     if(empty($_POST['name']) || empty($_POST['email']) ||empty($_POST['pass']) || strlen($_POST['pass'])<4 ){
+      if(empty($_POST['name'])){
+        $nameError = "<p style='color:red'>*Name cannot be null</p>";
+      }
+      if(empty($_POST['email'])){
+        $emailError = "<p style='color:red'>*Email cannot be null</p>";
+      }
+      if(empty($_POST['pass'])){
+        $passError = "<p style='color:red'>*Password cannot be null</p>";
+      }elseif(strlen($_POST['pass'])<4){
+        $passError = "<p style='color:red'>*Password should be at least 4 characters</p>";
+      }
+    }else{
       $name = $_POST['name'];
       $email = $_POST['email'];
       $pass = $_POST['pass'];
@@ -30,8 +43,7 @@
       if($result){
         echo "<script>alert('New account is added.');window.location.href='users.php'</script>";
       }
-
-    
+    }
 
   }
 ?>
@@ -49,15 +61,15 @@
               <div class="card-body">
                  <form action="user_add.php" method="post" >
                   <div class="form-group">
-                    <label for="">Name</label>
+                    <label for="">Name</label><?= empty($nameError)?'':$nameError;?>
                     <input type="text" class="form-control" name="name" required>
                   </div>
                   <div class="form-group">
-                    <label for="">Email</label><br>
+                    <label for="">Email</label><?= empty($emailError)?'':$emailError;?>
                     <input type="email" class="form-control" name="email" required>
                   </div>  
                   <div class="form-group">
-                    <label for="">Password</label>
+                    <label for="">Password</label><?= empty($passError)?'':$passError;?>
                     <input type="Password" class="form-control" name="pass" required>
                   </div>
                   <div class="form-group" style="margin-bottom: 1.5rem">

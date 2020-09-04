@@ -8,11 +8,12 @@
 
   $post_id = $_GET['id'];
 
-  if(isset($_POST['comment'])){
-  $comment = $_POST['comment'];
-  $userid = $_SESSION['id'];
+  if(isset($_POST['comment']) && !empty($_POST['comment']) ){
+   
+      $comment = $_POST['comment'];
+      $userid = $_SESSION['id'];
 
-  $stmt = $pdo->prepare("INSERT INTO comments(content,author_id,post_id) VALUES (:content,:author_id,:post_id)");
+      $stmt = $pdo->prepare("INSERT INTO comments(content,author_id,post_id) VALUES (:content,:author_id,:post_id)");
       $result = $stmt->execute(
         array(
           ":content"=>$comment,
@@ -20,8 +21,9 @@
           ":post_id"=>$post_id
         )
       );
-  
-}
+    
+  }
+
   ####Blog
   $stmt = $pdo->prepare("SELECT * FROM posts WHERE id=".$post_id);
     $stmt->execute();

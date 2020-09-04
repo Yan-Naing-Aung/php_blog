@@ -2,43 +2,56 @@
   session_start();
   require '../config/config.php';
 
-  if(empty($_SESSION['id']) && empty($_SESSION['logged_in'])){
+  if((empty($_SESSION['id']) && empty($_SESSION['logged_in'])) || $_SESSION['role']==0){
     header("location: login.php");
   }
   
   if(isset($_POST['submit'])){
     
-    $type = $_FILES['image']['type'];
-
-    if($type!="image/png" && $type!="image/jpg" && $type!="image/jpeg")
-    {
-      echo "<script>alert('Image type must be png,jpg,jpeg! ')</script>";
-    }
-    else
-    {
-      $imgname = $_FILES['image']['name'];
-      $tmp_name = $_FILES['image']['tmp_name'];
-
-      $title = $_POST['title'];
-      $content = $_POST['content'];
-
-      $user_id=$_SESSION['id'];
-
-      move_uploaded_file($tmp_name, "../images/$imgname");
-
-      $stmt = $pdo->prepare("INSERT INTO posts(title,content,image,author_id) VALUES (:title,:content,:image,:author_id)");
-      $result = $stmt->execute(
-        array(
-          ":title"=>$title,
-          ":content"=>$content,
-          ":image"=>$imgname,
-          ":author_id"=>$user_id
-        )
-      );
-      if($result){
-        echo "<script>alert('Values is added.');window.location.href='index.php';</script>";
+    if(empty($_POST['title']) || empty($_POST['content']) || empty($_FILES['image']['tmp_name'])){
+      if(empty($_POST['title'])){
+        $titleError = "<p style='color:red'>*Title cannot be null</p>";
       }
+      if(empty($_POST['content'])){
+        $contentError = "<p style='color:red'>*Content cannot be null</p>";
+      }
+      if(empty($_FILES['image']['tmp_name'])){
+        $imageError = "<p style='color:red'>*Image cannot be null</p>";
+      }
+    }else{
 
+      $type = $_FILES['image']['type'];
+
+      if($type!="image/png" && $type!="image/jpg" && $type!="image/jpeg")
+      {
+        echo "<script>alert('Image type must be png,jpg,jpeg! ')</script>";
+      }
+      else
+      {
+        $imgname = $_FILES['image']['name'];
+        $tmp_name = $_FILES['image']['tmp_name'];
+
+        $title = $_POST['title'];
+        $content = $_POST['content'];
+
+        $user_id=$_SESSION['id'];
+
+        move_uploaded_file($tmp_name, "../images/$imgname");
+
+        $stmt = $pdo->prepare("INSERT INTO posts(title,content,image,author_id) VALUES (:title,:content,:image,:author_id)");
+        $result = $stmt->execute(
+          array(
+            ":title"=>$title,
+            ":content"=>$content,
+            ":image"=>$imgname,
+            ":author_id"=>$user_id
+          )
+        );
+        if($result){
+          echo "<script>alert('Values is added.');window.location.href='index.php';</script>";
+        }
+
+      }
     }
 
   }
@@ -57,16 +70,16 @@
               <div class="card-body">
                  <form action="add.php" method="post" enctype="multipart/form-data">
                   <div class="form-group">
-                    <label for="">Title</label>
+                    <label for="">Title</label> <?= empty($titleError)?'':$titleError;?>
                     <input type="text" class="form-control" name="title" required>
                   </div>
                   <div class="form-group">
-                    <label for="">Content</label><br>
+                    <label for="">Content</label><?= empty($contentError)?'':$contentError;?>
                     <textarea class="form-control" name="content" rows="8" cols="80" required></textarea>
                   </div>
                   <div class="form-group">
-                    <label for="">Image</label><br>
-                    <input type="file" name="image">
+                    <label for="">Image</label><?= empty($imageError)?'':$imageError;?>
+                    <input type="file" name="image" required>
                   </div>
                   <div class="form-group">
                     <input type="submit" class="btn btn-success" name="submit" value="SUBMIT">
