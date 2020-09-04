@@ -76,11 +76,11 @@
                   <input type="hidden" name="_token" value="<?= $_SESSION['_token']; ?>">
                   <div class="form-group">
                     <label for="">Title</label><?= empty($titleError)?'':$titleError;?>
-                    <input type="text" class="form-control" name="title" value="<?= $result['title']?>" required>
+                    <input type="text" class="form-control" name="title" value="<?= escape($result['title'])?>" required>
                   </div>
                   <div class="form-group">
                     <label for="">Content</label><?= empty($contentError)?'':$contentError;?><br>
-                    <textarea class="form-control" name="content" rows="8" cols="80" required><?= $result['content']?>
+                    <textarea class="form-control" name="content" rows="8" cols="80" required><?= escape($result['content'])?>
                     </textarea>
                   </div>
                   <div class="form-group">

@@ -66,7 +66,7 @@
             <div class="card card-widget">
               <div class="card-header">
                  <div style="float:none; text-align: center" class="card-title">
-                  <h4><?= $blog['title']?></h4>
+                  <h4><?= escape($blog['title'])?></h4>
                 </div>
                 <!-- /.card-tools -->
               </div>
@@ -74,7 +74,7 @@
               <div class="card-body">
                 <img class="img-fluid pad" src="images/<?= $blog['image']?>" alt="Photo" width="100%">
                 <br><br>
-                <p><?= $blog['content']?></p>
+                <p><?= escape($blog['content'])?></p>
                 <h5>Comments</h5><hr>
                 <a href="index.php" type="button" class="btn btn-default">Go Back</a>
               </div>
@@ -87,10 +87,10 @@
                   <div class="card-comment">
                     <div class="comment-text" style="margin-left: 0px !important">
                       <span class="username">
-                        <?=$comment['name']?>
-                        <span class="text-muted float-right"><?= $comment['created_at']?></span>
+                        <?= escape($comment['name'])?>
+                        <span class="text-muted float-right"><?= escape($comment['created_at'])?></span>
                       </span><!-- /.username -->
-                      <?= $comment['content'] ?>
+                      <?= escape($comment['content']) ?>
                     </div>
                    </div>
                   <?php

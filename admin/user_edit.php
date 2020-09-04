@@ -75,11 +75,11 @@
                   <input type="hidden" name="id" value="<?= $result['id']?>">
                   <div class="form-group">
                     <label for="">Name</label><?= empty($nameError)?'':$nameError;?>
-                    <input type="text" class="form-control" name="name" value="<?= $result['name']?>" required>
+                    <input type="text" class="form-control" name="name" value="<?= escape($result['name'])?>" required>
                   </div>
                   <div class="form-group">
                     <label for="">Email</label><?= empty($emailError)?'':$emailError;?>
-                    <input type="email" class="form-control" name="email" value="<?= $result['email']?>" required>
+                    <input type="email" class="form-control" name="email" value="<?= escape($result['email'])?>" required>
                   </div>  
                   <div class="form-group">
                     <label for="">Password</label><?= empty($passError)?'':$passError;?>
